@@ -50,17 +50,17 @@ def scrape_rss():
     if not is_safe_url(url):
         return jsonify({'error': 'invalid or unsafe url'}), 400
     try:
-        resp = requests.get(url, timeout=10)
+        resp = requests.get(url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
         resp.raise_for_status()
         soup = BeautifulSoup(resp.content, 'html.parser')
         links = []
+        
         rss_type_re = re.compile(r'application/(?:rss|atom)\+xml', re.I)
-        for tag in soup.find_all('link'):
+        for tag in soup.find_all('link', href=True):
             type_attr = tag.get('type', '')
             if rss_type_re.search(type_attr):
-                href = tag.get('href')
-                if href:
-                    links.append({'title': tag.get('title') or href, 'link': urljoin(resp.url, href)})
+                href = tag['href']
+                links.append({'title': tag.get('title') or href, 'link': urljoin(resp.url, href)})
 
         for a in soup.find_all('a', href=True):
             href = a['href']
@@ -68,6 +68,28 @@ def scrape_rss():
                 item = {'title': a.get_text(strip=True) or href, 'link': urljoin(resp.url, href)}
                 if item not in links:
                     links.append(item)
+
+        # try common feed URL patterns if nothing found
+        if not links:
+            parsed = urlparse(resp.url)
+            base = f"{parsed.scheme}://{parsed.netloc}"
+            patterns = [
+                'feed', 'feed/', 'rss', 'rss.xml', 'atom.xml',
+                'feed.xml', 'index.xml', 'feeds/posts/default?alt=rss'
+            ]
+            for p in patterns:
+                guess = urljoin(base + '/', p)
+                if any(link['link'] == guess for link in links):
+                    continue
+                if not is_safe_url(guess):
+                    continue
+                try:
+                    r = requests.get(guess, timeout=5, headers={'User-Agent': 'Mozilla/5.0'})
+                    if r.status_code == 200 and ('xml' in r.headers.get('Content-Type', '').lower() or re.search(r'<(rss|feed)', r.text, re.I)):
+                        links.append({'title': p, 'link': guess})
+                except Exception:
+                    pass
+
         return jsonify({'rss_links': links})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
