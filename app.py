@@ -54,6 +54,7 @@ def scrape_rss():
         resp.raise_for_status()
         soup = BeautifulSoup(resp.content, 'html.parser')
         links = []
+        
         rss_type_re = re.compile(r'application/(?:rss|atom)\+xml', re.I)
         for tag in soup.find_all('link', href=True):
             type_attr = tag.get('type', '')
