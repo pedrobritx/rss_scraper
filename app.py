@@ -1,42 +1,39 @@
 from flask import Flask, request, jsonify
-import requests
+
 from bs4 import BeautifulSoup
+import requests
+
 from urllib.parse import urljoin
 
 app = Flask(__name__)
 
 @app.route('/scrape_rss')
 def scrape_rss():
-    """Fetch RSS/Atom links from a given URL."""
+
     url = request.args.get('url')
     if not url:
-        return jsonify({'error': 'Missing url parameter'}), 400
-
-    headers = {
-        'User-Agent': (
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
-            'AppleWebKit/537.36 (KHTML, like Gecko) '
-            'Chrome/114.0 Safari/537.36'
-        )
-    }
-
+        return jsonify({'error': 'missing url parameter'}), 400
     try:
-        resp = requests.get(url, headers=headers, timeout=15)
+        resp = requests.get(url, timeout=10)
         resp.raise_for_status()
-    except requests.RequestException as exc:
-        return jsonify({'error': str(exc)}), 500
+        soup = BeautifulSoup(resp.content, 'html.parser')
+        links = []
+        # link tags for RSS/Atom feeds
+        for tag in soup.find_all('link', type=['application/rss+xml', 'application/atom+xml']):
+            href = tag.get('href')
+            if href:
+                links.append({'title': tag.get('title') or href, 'link': urljoin(resp.url, href)})
+        # anchor tags that look like feeds
+        for a in soup.find_all('a', href=True):
+            href = a['href']
+            if 'rss' in href or 'feed' in href:
+                item = {'title': a.get_text(strip=True) or href, 'link': urljoin(resp.url, href)}
+                if item not in links:
+                    links.append(item)
+        return jsonify({'rss_links': links})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-    soup = BeautifulSoup(resp.text, 'html.parser')
-    rss_links = []
-    for tag in soup.find_all('link', type=['application/rss+xml', 'application/atom+xml']):
-        href = tag.get('href')
-        if href:
-            rss_links.append({
-                'title': tag.get('title', ''),
-                'link': urljoin(resp.url, href)
-            })
-
-    return jsonify({'rss_links': rss_links})
 
 if __name__ == '__main__':
     app.run(debug=True)
