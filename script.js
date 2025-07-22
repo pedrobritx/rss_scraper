@@ -15,7 +15,7 @@ function scrapeRSS() {
         progressBar.value = progress;
     }, 200);
 
-    fetch('http://localhost:5000/scrape_rss?url=' + encodeURIComponent(url))
+    fetch('/scrape_rss?url=' + encodeURIComponent(url))
         .then(response => response.json())
         .then(data => displayRSSLinks(data))
         .catch(() => {
