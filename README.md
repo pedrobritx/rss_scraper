@@ -1,6 +1,6 @@
 # RSS Scraper
 
-This project is a simple RSS Scraper built with HTML, CSS, JavaScript, and Python.
+This project is an RSS Scraper built with HTML, CSS, JavaScript, and Python.
 
 ## Project Structure
 
