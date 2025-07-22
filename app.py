@@ -87,12 +87,26 @@ def scrape_rss():
         resp.raise_for_status()
         soup = BeautifulSoup(resp.content, 'html.parser')
 
-        base = resp.url
-        links = extract_feed_links(soup, base)
+        links = []
+        
+        rss_type_re = re.compile(r'application/(?:rss|atom)\+xml', re.I)
+        for tag in soup.find_all('link', href=True):
+            type_attr = tag.get('type', '')
+            if rss_type_re.search(type_attr):
+                href = tag['href']
+                links.append({'title': tag.get('title') or href, 'link': urljoin(resp.url, href)})
+
+        for a in soup.find_all('a', href=True):
+            href = a['href']
+            if re.search(r'(rss|atom|feed)', href, re.I):
+                item = {'title': a.get_text(strip=True) or href, 'link': urljoin(resp.url, href)}
+                if item not in links:
+                    links.append(item)
 
         # try common feed URL patterns if nothing found
         if not links:
             parsed = urlparse(resp.url)
+
             base_root = f"{parsed.scheme}://{parsed.netloc}"
             patterns = [
                 "feed",
@@ -110,10 +124,12 @@ def scrape_rss():
             for p in patterns:
                 guess = urljoin(base_root + "/", p)
                 if guess in existing:
+                
                     continue
                 if not is_safe_url(guess):
                     continue
                 try:
+
                     r = requests.get(
                         guess,
                         timeout=5,
@@ -125,6 +141,7 @@ def scrape_rss():
                     ):
                         links.append({"title": p, "link": guess})
                         existing.add(guess)
+
                 except Exception:
                     pass
 
