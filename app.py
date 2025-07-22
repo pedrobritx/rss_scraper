@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify
+
 from bs4 import BeautifulSoup
 import requests
+
 from urllib.parse import urljoin
 
 app = Flask(__name__)
 
 @app.route('/scrape_rss')
 def scrape_rss():
+
     url = request.args.get('url')
     if not url:
         return jsonify({'error': 'missing url parameter'}), 400
@@ -30,6 +33,7 @@ def scrape_rss():
         return jsonify({'rss_links': links})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

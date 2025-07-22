@@ -16,7 +16,9 @@ To run this project locally, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/yourusername/rss_scraper.git`
 2. Navigate into the project directory: `cd rss_scraper`
-3. Open `index.html` in your browser.
+3. Install the dependencies: `pip install -r requirements.txt`
+4. Start the backend server: `python app.py`
+5. Open `index.html` in your browser.
 
 ## Features
 
