@@ -18,6 +18,7 @@ To run this project locally, follow these steps:
 2. Navigate into the project directory: `cd rss_scraper`
 3. Install the dependencies: `pip install -r requirements.txt`
 4. Start the backend server: `python app.py`
+   - Optionally set the `PORT` environment variable to change the port (defaults to `5000`), e.g. `PORT=8000 python app.py`.
 5. Open `index.html` in your browser.
 
 ## Features

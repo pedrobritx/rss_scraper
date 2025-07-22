@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import os
 
 from bs4 import BeautifulSoup
 import requests
@@ -36,4 +37,5 @@ def scrape_rss():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(debug=True, port=port)
