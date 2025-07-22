@@ -8,6 +8,8 @@ import requests
 from urllib.parse import urljoin, urlparse
 import ipaddress
 import socket
+import os
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -52,15 +54,17 @@ def scrape_rss():
         resp.raise_for_status()
         soup = BeautifulSoup(resp.content, 'html.parser')
         links = []
-        # link tags for RSS/Atom feeds
-        for tag in soup.find_all('link', type=['application/rss+xml', 'application/atom+xml']):
-            href = tag.get('href')
-            if href:
-                links.append({'title': tag.get('title') or href, 'link': urljoin(resp.url, href)})
-        # anchor tags that look like feeds
+        rss_type_re = re.compile(r'application/(?:rss|atom)\+xml', re.I)
+        for tag in soup.find_all('link'):
+            type_attr = tag.get('type', '')
+            if rss_type_re.search(type_attr):
+                href = tag.get('href')
+                if href:
+                    links.append({'title': tag.get('title') or href, 'link': urljoin(resp.url, href)})
+
         for a in soup.find_all('a', href=True):
             href = a['href']
-            if 'rss' in href or 'feed' in href:
+            if re.search(r'(rss|atom|feed)', href, re.I):
                 item = {'title': a.get_text(strip=True) or href, 'link': urljoin(resp.url, href)}
                 if item not in links:
                     links.append(item)
