@@ -66,6 +66,7 @@ main {
 .loading-container {
   margin-top: 10px;
   padding: 10px;
+  display: none;
 }
 
 /* Glass Styles */
@@ -115,6 +116,10 @@ progress {
   margin-top: 20px;
 }
 
+.result-container {
+  display: none;
+}
+
 /* Input and Output Styles */
 input[type="url"], output {
   background-color: rgba(255, 255, 255, 0.5);
@@ -123,6 +128,15 @@ input[type="url"], output {
   margin-right: 10px;
   padding: 10px;
   width: 100%;
+}
+
+.text-put {
+  font-size: 1rem;
+  width: 100%;
+}
+
+.rss-output {
+  white-space: pre-wrap;
 }
 
 /* Button Styles */
