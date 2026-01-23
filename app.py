@@ -11,8 +11,6 @@ import socket
 import os
 import re
 
-from typing import List, Dict
-
 app = Flask(__name__)
 CORS(app)
 
@@ -88,7 +86,6 @@ def scrape_rss():
         soup = BeautifulSoup(resp.content, 'html.parser')
 
         links = []
-        
         rss_type_re = re.compile(r'application/(?:rss|atom)\+xml', re.I)
         for tag in soup.find_all('link', href=True):
             type_attr = tag.get('type', '')
@@ -106,42 +103,21 @@ def scrape_rss():
         # try common feed URL patterns if nothing found
         if not links:
             parsed = urlparse(resp.url)
-
-            base_root = f"{parsed.scheme}://{parsed.netloc}"
+            base = f"{parsed.scheme}://{parsed.netloc}"
             patterns = [
-                "feed",
-                "feed/",
-                "rss",
-                "rss.xml",
-                "atom.xml",
-                "feed.xml",
-                "index.xml",
-                "feeds/posts/default?alt=rss",
+                'feed', 'feed/', 'rss', 'rss.xml', 'atom.xml',
+                'feed.xml', 'index.xml', 'feeds/posts/default?alt=rss'
             ]
-
-            existing = {l["link"] for l in links}
-
             for p in patterns:
-                guess = urljoin(base_root + "/", p)
-                if guess in existing:
-                
+                guess = urljoin(base + '/', p)
+                if any(link['link'] == guess for link in links):
                     continue
                 if not is_safe_url(guess):
                     continue
                 try:
-
-                    r = requests.get(
-                        guess,
-                        timeout=5,
-                        headers={"User-Agent": "Mozilla/5.0"},
-                    )
-                    if r.status_code == 200 and (
-                        "xml" in r.headers.get("Content-Type", "").lower()
-                        or re.search(r"<(rss|feed)", r.text, re.I)
-                    ):
-                        links.append({"title": p, "link": guess})
-                        existing.add(guess)
-
+                    r = requests.get(guess, timeout=5, headers={'User-Agent': 'Mozilla/5.0'})
+                    if r.status_code == 200 and ('xml' in r.headers.get('Content-Type', '').lower() or re.search(r'<(rss|feed)', r.text, re.I)):
+                        links.append({'title': p, 'link': guess})
                 except Exception:
                     pass
 
