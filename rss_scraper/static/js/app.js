@@ -9,11 +9,13 @@ function scrapeRSS() {
 	const statsOutput = document.getElementById("statsOutput");
 	const rssList = document.getElementById("rssList");
 	const errorOutput = document.getElementById("errorOutput");
+	const mainContainer = document.getElementById("mainContainer");
 
 	// Reset UI
 	progressBar.value = 0;
 	loadingContainer.style.display = "flex";
 	resultContainer.style.display = "none";
+	mainContainer.classList.remove("glass");
 	statsOutput.textContent = "";
 	rssList.innerHTML = "";
 	errorOutput.textContent = "";
@@ -39,7 +41,9 @@ function scrapeRSS() {
 		})
 		.catch((error) => {
 			errorOutput.textContent = error.message;
+			errorOutput.textContent = error.message;
 			resultContainer.style.display = "flex"; // Show container to show error
+			mainContainer.classList.add("glass");
 		})
 		.finally(() => {
 			clearInterval(interval);
@@ -47,6 +51,7 @@ function scrapeRSS() {
 			loadingContainer.style.display = "none";
 			if (!errorOutput.textContent) {
 				resultContainer.style.display = "flex";
+				mainContainer.classList.add("glass");
 			}
 		});
 }
@@ -70,15 +75,26 @@ function displayResults(data) {
 			const textContainer = document.createElement("div");
 			textContainer.className = "text-truncate me-3";
 
+			const titleRow = document.createElement("div");
+			titleRow.className = "d-flex align-items-center gap-2";
+
 			const title = document.createElement("div");
 			title.className = "fw-bold";
 			title.textContent = feed.title || "Untitled Feed";
+
+			const badge = document.createElement("span");
+			badge.className = "badge rounded-pill bg-white text-dark bg-opacity-25";
+			badge.style.fontSize = "0.7em";
+			badge.textContent = (feed.type || "RSS").toUpperCase();
+
+			titleRow.appendChild(title);
+			titleRow.appendChild(badge);
 
 			const link = document.createElement("div");
 			link.className = "small text-light text-opacity-75 text-truncate";
 			link.textContent = feed.url;
 
-			textContainer.appendChild(title);
+			textContainer.appendChild(titleRow);
 			textContainer.appendChild(link);
 
 			const copyBtn = document.createElement("button");

@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from typing import List, Dict, Set
 from urllib.parse import urljoin, urlparse
 from rss_scraper.security import is_safe_url
+from rss_scraper.scraper.validate import validate_feed
 
 def extract_feed_links(soup: BeautifulSoup, base: str) -> List[Dict[str, str]]:
     """Return a list of feed links discovered in the given page."""
@@ -70,12 +71,9 @@ def discover_feeds(url: str) -> List[Dict[str, str]]:
                 if not is_safe_url(guess):
                     continue
                 
-                try:
-                    r = requests.get(guess, timeout=5, headers={'User-Agent': 'Mozilla/5.0 RSS-Scraper/1.0'})
-                    if r.status_code == 200 and ('xml' in r.headers.get('Content-Type', '').lower() or re.search(r'<(rss|feed)', r.text, re.I)):
-                        links.append({'title': p, 'link': guess})
-                except Exception:
-                    pass
+                res = validate_feed(guess)
+                if res['status'] == 'valid':
+                    links.append({'title': p, 'link': guess})
         
         return links
     except Exception as e:

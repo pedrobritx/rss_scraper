@@ -3,7 +3,7 @@ name = "rss-scraper"
 version = "1.0.0"
 description = "A simple RSS scraper application"
 authors = [
-    { name = "Pedro", email = "pedro@example.com" }
+    { name = "Pedro Brito", email = "pedrobritx@icloud.com" }
 ]
 dependencies = [
     "flask>=3.0.0",

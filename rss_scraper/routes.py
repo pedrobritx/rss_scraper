@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template
 from rss_scraper.scraper.discover import discover_feeds
+from rss_scraper.scraper.validate import validate_feed
 from rss_scraper.security import is_safe_url
 import time
 
@@ -26,12 +27,16 @@ def scrape_rss():
         raw_links = discover_feeds(url)
         
         for link in raw_links:
+            # Validate each discovered link to get real type and status
+            val_res = validate_feed(link['link'])
+            
             feeds.append({
                 "url": link['link'],
                 "title": link['title'],
-                "type": "unknown", # logic to detect type could be added
-                "source": "discovered",
-                "status": "unchecked" 
+                "type": val_res['type'], 
+                "source": "discovered", # This could be refined if we tracked source in discover.py
+                "status": val_res['status'],
+                "error": val_res['error']
             })
             
     except ValueError as e:
