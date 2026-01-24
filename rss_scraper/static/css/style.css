@@ -7,14 +7,30 @@
 	--font-family:
 		-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
 		Helvetica, Arial, sans-serif;
-	--border-radius: 24px;
-	--box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+	/* Standardized Glass System */
+	--glass-radius: 30px;
+	--button-radius: 50px;
+
+	/* Refractive Material */
+	--glass-bg: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.12) 0%,
+		rgba(255, 255, 255, 0.01) 100%
+	);
+
+	--glass-border: 1px solid rgba(255, 255, 255, 0.18);
+
+	/* Liquid Depth & Shine */
+	--glass-shadow:
+		inset 0 0 20px rgba(255, 255, 255, 0.05),
+		inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+
+	/* Strong Blur for Refraction feels */
+	--backdrop-filter: blur(24px) saturate(160%);
+
 	--transition-duration: 0.3s;
 	--transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
-	--backdrop-filter: blur(40px) saturate(180%);
-	--glass-bg: rgba(255, 255, 255, 0.05);
-	--glass-border: rgba(255, 255, 255, 0.15);
-	--hover-box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 /* Base Styles */
@@ -34,14 +50,25 @@ body {
 
 header,
 footer {
-	background: rgba(0, 0, 0, 0.2);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
+	background: linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.08),
+		rgba(255, 255, 255, 0)
+	);
+	backdrop-filter: var(--backdrop-filter);
+	-webkit-backdrop-filter: var(--backdrop-filter);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	color: rgba(255, 255, 255, 0.9);
 	padding: 20px 0;
 	text-align: center;
 	font-weight: 500;
 	letter-spacing: -0.5px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+	border-bottom: none;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Main Styles */
@@ -86,9 +113,9 @@ main {
 	background: var(--glass-bg);
 	backdrop-filter: var(--backdrop-filter);
 	-webkit-backdrop-filter: var(--backdrop-filter);
-	border: 1px solid var(--glass-border);
-	border-radius: var(--border-radius);
-	box-shadow: var(--box-shadow);
+	border: var(--glass-border);
+	border-radius: var(--glass-radius);
+	box-shadow: var(--glass-shadow);
 	margin: 20px 0;
 	padding: 40px;
 	width: 100%;
@@ -128,16 +155,24 @@ progress {
 
 /* Input Styles */
 input[type="url"] {
-	background-color: rgba(255, 255, 255, 0.08);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 16px;
+	background: rgba(
+		255,
+		255,
+		255,
+		0.05
+	); /* Slightly darker for input contrast */
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: var(--button-radius); /* Match buttons */
 	color: white;
 	margin: 0;
-	padding: 16px 20px;
+	padding: 16px 24px;
 	width: 100%;
 	flex-grow: 1;
 	font-size: 17px;
 	transition: all 0.2s ease;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 input[type="url"]:focus {
@@ -153,18 +188,20 @@ input[type="url"]::placeholder {
 
 /* Button Styles - Standardized */
 button {
-	background: rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	border-radius: 16px;
+	background: var(--glass-bg);
+	backdrop-filter: var(--backdrop-filter);
+	-webkit-backdrop-filter: var(--backdrop-filter);
+	border: var(--glass-border);
+	border-radius: var(--button-radius);
+	box-shadow: var(--glass-shadow);
 	color: white;
 	cursor: pointer;
 	font-weight: 600;
 	padding: 16px 32px;
-	transition: all 0.2s ease;
+	transition: all 0.3s ease;
 	min-width: 120px;
 	font-size: 16px;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
@@ -174,19 +211,64 @@ button:hover {
 }
 
 button:active {
-	transform: translateY(0);
-	background: rgba(255, 255, 255, 0.05);
+	transform: scale(0.96) translateY(2px);
+	/* Inset shadow increases to look like a hole/indentation in the water */
+	box-shadow:
+		inset 0 6px 15px rgba(0, 0, 0, 0.2),
+		/* Deepening */ inset 0 0 10px rgba(255, 255, 255, 0.1),
+		/* Inner glow fade */ 0 2px 10px rgba(0, 0, 0, 0.1); /* Reduced drop shadow */
+	background: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.05) 0%,
+		/* Darker/More transparent top */ rgba(255, 255, 255, 0.01) 100%
+	);
+	backdrop-filter: blur(18px); /* Slight warp in blur */
 }
 
 .scrapeBtn {
-	background: #007aff;
-	border: none;
-	box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+	background: radial-gradient(
+		100% 100% at 50% 0%,
+		rgba(255, 255, 255, 0.4) 0%,
+		rgba(255, 255, 255, 0.05) 100%
+	);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	border-radius: 50px;
+	box-shadow:
+		inset 0 0 20px rgba(255, 255, 255, 0.2),
+		inset 0 2px 0 rgba(255, 255, 255, 0.4),
+		0 8px 32px rgba(0, 0, 0, 0.3);
+	color: white;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .scrapeBtn:hover {
-	background: #0063cc;
-	box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+	background: radial-gradient(
+		100% 100% at 50% 0%,
+		rgba(255, 255, 255, 0.5) 0%,
+		rgba(255, 255, 255, 0.1) 100%
+	);
+	box-shadow:
+		inset 0 0 30px rgba(255, 255, 255, 0.3),
+		inset 0 2px 0 rgba(255, 255, 255, 0.6),
+		0 12px 40px rgba(0, 0, 0, 0.4);
+	transform: translateY(-2px) scale(1.02);
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.scrapeBtn:active {
+	/* Move the highlight "in" or disperse it */
+	background: radial-gradient(
+		120% 120% at 50% 30%,
+		/* Shifted center */ rgba(255, 255, 255, 0.2) 0%,
+		rgba(255, 255, 255, 0.01) 100%
+	);
+	box-shadow:
+		inset 0 4px 25px rgba(0, 0, 0, 0.1),
+		inset 0 2px 4px rgba(255, 255, 255, 0.2),
+		/* Subtler rim */ 0 2px 10px rgba(0, 0, 0, 0.2);
+	transform: scale(0.95) translateY(1px);
 }
 
 /* Link Styles & Social */
@@ -213,13 +295,18 @@ a:hover {
 
 /* List Group Item Overrides (for app.js generated content) */
 .list-group-item {
-	background: rgba(255, 255, 255, 0.03) !important;
-	border: 1px solid rgba(255, 255, 255, 0.05) !important;
-	backdrop-filter: none !important;
+	background: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.08),
+		rgba(255, 255, 255, 0.01)
+	) !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	backdrop-filter: blur(10px) !important;
 	margin-bottom: 8px;
-	border-radius: 16px !important;
-	transition: background 0.2s;
+	border-radius: 20px !important;
+	transition: all 0.2s;
 	padding: 16px !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .list-group-item:hover {
